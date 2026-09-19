@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+
+        <span class="hero-badge">EXAM PROJECT</span>
+
+        <h1>
+            Share ideas.<br>
+            <span>Discover stories.</span>
+        </h1>
+
+        <p>
+            Read interesting articles, share your own ideas,
+            and discover what other people have to say.
+        </p>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'article_list' %}" class="btn btn-secondary">
+                Browse Articles
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-secondary">
+                Join Us
+            </a>
+        {% endif %}
+
+    </div>
+</section>
+
+
+<section class="features">
+
+    <div class="feature-card">
+        <h3>📚 Discover</h3>
+        <p>
+            Explore articles written by different authors
+            and discover new topics.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>✍️ Create</h3>
+        <p>
+            Share your own ideas and create articles
+            for other users to read.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3>⭐ Rate</h3>
+        <p>
+            Like, dislike, favorite, and rate articles
+            you find interesting.
+        </p>
+    </div>
+
+</section>
+
+{% endblock %}
