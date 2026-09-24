@@ -1,28 +1,35 @@
-"""
-URL configuration for exam_project project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import include, path
+from django.db.models import Avg
+
+from articles.models import Article
 
 
 def home(request):
-    return render(request, "home.html")
+
+    popular_articles = Article.objects.filter(
+        status="published"
+    ).annotate(
+        average_rating=Avg("ratings__value")
+    ).filter(
+        average_rating__gte=4
+    ).select_related(
+        "author",
+        "category"
+    ).prefetch_related(
+        "ratings",
+        "likes",
+        "dislikes",
+        "favorites"
+    ).order_by(
+        "-average_rating",
+        "-created_at"
+    )[:3]
+
+    return render(request, "home.html", {
+        "popular_articles": popular_articles
+    })
 
 
 urlpatterns = [

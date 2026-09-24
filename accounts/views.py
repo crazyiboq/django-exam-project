@@ -1,42 +1,59 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+from .forms import RegisterForm
+
+from .forms import ProfileForm
+from .models import Profile
+@login_required
+def profile_view(request):
+    profile, created = Profile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method == "POST":
+        form = ProfileForm(
+            request.POST,
+            request.FILES,
+            instance=profile,
+            user=request.user
+        )
+
+        if form.is_valid():
+            form.save()
+
+            return redirect("profile")
+
+    else:
+        form = ProfileForm(
+            instance=profile,
+            user=request.user
+        )
+
+    return render(request, "account/profile.html", {
+        "profile_user": request.user,
+        "article_count": request.user.articles.count(),
+        "form": form,
+    })
 
 
 def register_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        password_confirm = request.POST.get("password_confirm")
+        form = RegisterForm(request.POST)
 
-        if password != password_confirm:
-            return render(request, "account/register.html", {
-                "error": "Passwords do not match."
-            })
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
 
-        if User.objects.filter(username=username).exists():
-            return render(request, "account/register.html", {
-                "error": "Username already exists."
-            })
+            return redirect("home")
+    else:
+        form = RegisterForm()
 
-        if User.objects.filter(email=email).exists():
-            return render(request, "account/register.html", {
-                "error": "Email already exists."
-            })
-
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-
-        login(request, user)
-
-        return redirect("home")
-
-    return render(request, "account/register.html")
-
+    return render(request, "account/register.html", {
+        "form": form
+    })
 
 def login_view(request):
     if request.method == "POST":

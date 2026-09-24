@@ -1,13 +1,24 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Avg
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=200)
+
+    title = models.CharField(
+        max_length=200
+    )
 
     image = models.ImageField(
         upload_to="articles/",
@@ -30,9 +41,22 @@ class Article(models.Model):
         related_name="articles"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("pending", "Pending"),
+            ("published", "Published"),
+        ],
+        default="pending"
+    )
 
     likes = models.ManyToManyField(
         User,
@@ -52,11 +76,20 @@ class Article(models.Model):
         blank=True
     )
 
+    def average_rating(self):
+
+        result = self.ratings.aggregate(
+            average=Avg("value")
+        )["average"]
+
+        return result or 0
+
     def __str__(self):
         return self.title
 
 
 class ArticleRating(models.Model):
+
     article = models.ForeignKey(
         Article,
         on_delete=models.CASCADE,
@@ -71,6 +104,7 @@ class ArticleRating(models.Model):
     value = models.PositiveSmallIntegerField()
 
     class Meta:
+
         constraints = [
             models.UniqueConstraint(
                 fields=["article", "user"],

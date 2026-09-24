@@ -1,10 +1,242 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}{{ article.title }} | Exam Project{% endblock %}
+
+{% block content %}
+
+<div class="article-detail-container">
+
+    <article class="article-detail-card">
+
+        {% if article.image %}
+            <img
+                src="{{ article.image.url }}"
+                alt="{{ article.title }}"
+                class="article-detail-image"
+            >
+        {% endif %}
+
+
+        <div class="article-detail-content">
+
+            <!-- Category + Date -->
+            <div class="article-meta">
+
+                {% if article.category %}
+                    <span class="article-category">
+                        {{ article.category.name }}
+                    </span>
+                {% endif %}
+
+                <span>
+                    {{ article.created_at|date:"F d, Y" }}
+                </span>
+
+            </div>
+
+
+            <!-- Title -->
+            <h1>{{ article.title }}</h1>
+
+
+            <!-- Author -->
+            <div class="article-detail-author">
+                By <strong>{{ article.author.username }}</strong>
+            </div>
+
+
+            <!-- Article Content -->
+            <div class="article-content">
+                {{ article.content|linebreaks }}
+            </div>
+
+
+            <!-- Statistics -->
+            <div class="article-stats">
+
+                <span>
+                    👍 {{ article.likes.count }}
+                </span>
+
+                <span>
+                    👎 {{ article.dislikes.count }}
+                </span>
+
+                <span>
+                    ❤️ {{ article.favorites.count }}
+                </span>
+
+                    <span>
+                        ⭐ {{ article.average_rating|floatformat:1 }} / 5
+                    </span>
+            </div>
+
+
+            <!-- Rating -->
+            {% if user.is_authenticated %}
+
+                <div class="article-rating">
+
+                    <p>Rate this article:</p>
+
+                    <form method="POST"
+                          action="{% url 'article_rate' article.id %}"
+                          class="rating-form">
+
+                        {% csrf_token %}
+
+                        <div class="star-rating">
+
+                            <input
+                                type="radio"
+                                id="rating-5"
+                                name="rating"
+                                value="5"
+                            >
+                            <label for="rating-5">★</label>
+
+
+                            <input
+                                type="radio"
+                                id="rating-4"
+                                name="rating"
+                                value="4"
+                            >
+                            <label for="rating-4">★</label>
+
+
+                            <input
+                                type="radio"
+                                id="rating-3"
+                                name="rating"
+                                value="3"
+                            >
+                            <label for="rating-3">★</label>
+
+
+                            <input
+                                type="radio"
+                                id="rating-2"
+                                name="rating"
+                                value="2"
+                            >
+                            <label for="rating-2">★</label>
+
+
+                            <input
+                                type="radio"
+                                id="rating-1"
+                                name="rating"
+                                value="1"
+                            >
+                            <label for="rating-1">★</label>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="rating-submit-button">
+                            Submit Rating
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Actions -->
+            <div class="article-actions">
+
+                {% if user.is_authenticated %}
+
+                    <!-- Like -->
+                    <form method="POST"
+                          action="{% url 'article_like' article.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="article-action-button">
+                            👍 Like
+                        </button>
+
+                    </form>
+
+
+                    <!-- Dislike -->
+                    <form method="POST"
+                          action="{% url 'article_dislike' article.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="article-action-button">
+                            👎 Dislike
+                        </button>
+
+                    </form>
+
+
+                    <!-- Favorite -->
+                    <form method="POST"
+                          action="{% url 'article_favorite' article.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="article-action-button">
+                            ❤️ Favorite
+                        </button>
+
+                    </form>
+
+
+                    <!-- Edit / Delete -->
+                    {% if user.is_superuser or user.is_staff or article.author == user %}
+
+                        <a href="{% url 'article_edit' article.id %}"
+                           class="article-action-button">
+                            ✏️ Edit Article
+                        </a>
+
+                        <a href="{% url 'article_delete' article.id %}"
+                           class="article-action-button">
+                            🗑️ Delete Article
+                        </a>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <p>
+                        <a href="{% url 'login' %}">
+                            Log in
+                        </a>
+                        to interact with this article.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Back -->
+            <div class="article-back">
+
+                <a href="{% url 'article_list' %}"
+                   class="btn btn-secondary">
+                    ← Back to Articles
+                </a>
+
+            </div>
+
+        </div>
+
+    </article>
+
+</div>
+
+{% endblock %}

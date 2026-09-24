@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Articles | Exam Project{% endblock %}
+{% block title %}Popular Articles | Exam Project{% endblock %}
 
 {% block content %}
 
@@ -9,15 +9,12 @@
     <div class="articles-header">
 
         <div>
-            <h1>Articles</h1>
-            <p>Discover what people are sharing.</p>
-        </div>
+            <h1>Popular Articles</h1>
 
-        {% if user.is_authenticated %}
-            <a href="{% url 'article_create' %}" class="btn btn-secondary">
-                Create Article
-            </a>
-        {% endif %}
+            <p>
+                Articles with an average rating of 4 or higher.
+            </p>
+        </div>
 
     </div>
 
@@ -31,31 +28,38 @@
                 <article class="article-card">
 
                     {% if article.image %}
+
                         <img
                             src="{{ article.image.url }}"
                             alt="{{ article.title }}"
                             class="article-image"
                         >
+
                     {% endif %}
+
 
                     <div class="article-card-content">
 
                         <div class="article-meta">
 
                             {% if article.category %}
+
                                 <span class="article-category">
                                     {{ article.category.name }}
                                 </span>
+
                             {% endif %}
 
                             <span>
-                                {{ article.created_at|date:"M d, Y" }}
+                                {{ article.created_at|date:"F d, Y H:i" }}
                             </span>
 
                         </div>
 
 
-                        <h2>{{ article.title }}</h2>
+                        <h2>
+                            {{ article.title }}
+                        </h2>
 
 
                         <p class="article-author">
@@ -79,18 +83,21 @@
                             </span>
 
                             <span>
-                                ⭐ {{ article.average_rating|floatformat:1 }} / 5
+                                ❤️ {{ article.favorites.count }}
                             </span>
 
-                            <span>
-                                ❤️ {{ article.favorites.count }}
+                            <span class="article-average-rating">
+                                ⭐ {{ article.average_rating|floatformat:1 }}
                             </span>
 
                         </div>
 
 
-                        <a href="{% url 'article_detail' article.id %}" class="btn btn-secondary">
-                            Read Article
+                        <a
+                            href="{% url 'article_detail' article.id %}"
+                            class="btn btn-secondary"
+                        >
+                            Read Article →
                         </a>
 
                     </div>
@@ -105,17 +112,12 @@
 
         <div class="empty-articles">
 
-            <h2>No articles yet</h2>
+            <h2>No popular articles yet</h2>
 
             <p>
-                Be the first person to publish an article.
+                Articles with an average rating of 4 or higher
+                will appear here.
             </p>
-
-            {% if user.is_authenticated %}
-                <a href="{% url 'article_create' %}" class="btn btn-secondary">
-                    Create Article
-                </a>
-            {% endif %}
 
         </div>
 

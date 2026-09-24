@@ -1,10 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Profile | Exam Project{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+
+    <div class="profile-card">
+
+        <h1>My Profile</h1>
+
+        <div class="profile-info">
+
+            <div class="profile-row">
+                <span class="profile-label">Username</span>
+                <span>{{ profile_user.username }}</span>
+            </div>
+
+            <div class="profile-row">
+                <span class="profile-label">Articles</span>
+                <span>{{ article_count }}</span>
+            </div>
+
+        </div>
+
+        <h2>Edit Information</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {% for field in form %}
+
+                <div class="form-group">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <div class="error-message">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+            <button type="submit" class="btn btn-secondary">
+                Save Changes
+            </button>
+
+        </form>
+
+        <br>
+
+        <a href="{% url 'article_list' %}" class="btn btn-secondary">
+            Browse Articles
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

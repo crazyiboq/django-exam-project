@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Articles | Exam Project{% endblock %}
+
+{% block content %}
+
+<div class="articles-container">
+
+    <div class="articles-header">
+
+        <div>
+            <span class="pending-label">
+                🕐 ADMIN REVIEW
+            </span>
+
+            <h1>Pending Articles</h1>
+
+            <p>
+                Review articles before they are published.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'article_list' %}"
+            class="btn btn-secondary"
+        >
+            ← Back to Articles
+        </a>
+
+    </div>
+
+
+    {% if articles %}
+
+        <div class="articles-grid">
+
+            {% for article in articles %}
+
+                <article class="article-card">
+
+                    {% if article.image %}
+
+                        <img
+                            src="{{ article.image.url }}"
+                            alt="{{ article.title }}"
+                            class="article-image"
+                        >
+
+                    {% endif %}
+
+
+                    <div class="article-card-content">
+
+                        <div class="article-meta">
+
+                            {% if article.category %}
+
+                                <span class="article-category">
+                                    {{ article.category.name }}
+                                </span>
+
+                            {% endif %}
+
+                            <span class="pending-status">
+                                Pending
+                            </span>
+
+                        </div>
+
+
+                        <h2>
+                            {{ article.title }}
+                        </h2>
+
+
+                        <p class="article-author">
+                            By {{ article.author.username }}
+                        </p>
+
+
+                        <p class="article-preview">
+                            {{ article.content|truncatewords:30 }}
+                        </p>
+
+
+                        <div class="pending-date">
+
+                            Submitted:
+                            {{ article.created_at|date:"M d, Y H:i" }}
+
+                        </div>
+
+
+                        <div class="pending-actions">
+
+                            <a
+                                href="{% url 'article_detail' article.id %}"
+                                class="btn btn-secondary"
+                            >
+                                Preview
+                            </a>
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'approve_article' article.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="approve-button"
+                                >
+                                    ✓ Approve
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="pending-empty">
+
+            <div class="pending-empty-icon">
+                ✓
+            </div>
+
+            <h2>No pending articles</h2>
+
+            <p>
+                All submitted articles have been reviewed.
+            </p>
+
+            <a
+                href="{% url 'article_list' %}"
+                class="btn btn-secondary"
+            >
+                View Articles
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Authors | Exam Project{% endblock %}
+
+{% block content %}
+
+<div class="authors-container">
+
+    <div class="authors-header">
+
+        <span class="authors-label">
+            ✍️ COMMUNITY
+        </span>
+
+        <h1>Authors</h1>
+
+        <p>
+            Discover writers and explore their published articles.
+        </p>
+
+    </div>
+
+
+    {% if authors %}
+
+        <div class="authors-grid">
+
+            {% for author in authors %}
+
+                <a
+                    href="{% url 'author_articles' author.id %}"
+                    class="author-card"
+                >
+
+                    <div class="author-avatar">
+                        {{ author.username|first|upper }}
+                    </div>
+
+
+                    <div class="author-info">
+
+                        <h2>
+                            {{ author.username }}
+                        </h2>
+
+                        <p>
+                            View published articles
+                        </p>
+
+                    </div>
+
+
+                    <span class="author-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-articles">
+
+            <h2>No authors yet</h2>
+
+            <p>
+                Authors will appear here after publishing articles.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

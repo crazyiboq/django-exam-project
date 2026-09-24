@@ -20,86 +20,68 @@
 
         </div>
 
-
-        {% if error %}
-            <div class="error-message">
-                {{ error }}
-            </div>
-        {% endif %}
-
-
+        <!-- Registration Form -->
         <form method="POST" class="auth-form">
 
             {% csrf_token %}
 
+            {{ form.non_field_errors }}
 
             <div class="form-group">
-
-                <label for="username">
+                <label for="{{ form.username.id_for_label }}">
                     Username
                 </label>
 
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Choose a username"
-                    required
-                >
+                {{ form.username }}
 
+                {% for error in form.username.errors %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endfor %}
             </div>
 
-
             <div class="form-group">
-
-                <label for="email">
+                <label for="{{ form.email.id_for_label }}">
                     Email address
                 </label>
 
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    required
-                >
+                {{ form.email }}
 
+                {% for error in form.email.errors %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endfor %}
             </div>
 
-
             <div class="form-group">
-
-                <label for="password">
+                <label for="{{ form.password1.id_for_label }}">
                     Password
                 </label>
 
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Create a password"
-                    required
-                >
+                {{ form.password1 }}
 
+                {% for error in form.password1.errors %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endfor %}
             </div>
 
-
             <div class="form-group">
-
-                <label for="password_confirm">
+                <label for="{{ form.password2.id_for_label }}">
                     Confirm password
                 </label>
 
-                <input
-                    type="password"
-                    id="password_confirm"
-                    name="password_confirm"
-                    placeholder="Repeat your password"
-                    required
-                >
+                {{ form.password2 }}
 
+                {% for error in form.password2.errors %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endfor %}
             </div>
-
 
             <button type="submit" class="primary-button">
                 Create account
@@ -107,14 +89,11 @@
 
         </form>
 
-
         <div class="auth-footer">
-
             <p>
                 Already have an account?
                 <a href="{% url 'login' %}">Sign in</a>
             </p>
-
         </div>
 
     </div>
