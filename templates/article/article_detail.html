@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title }} | Exam Project{% endblock %}
+{% block title %}
+    {{ article.title }} | Exam Project
+{% endblock %}
 
 {% block content %}
 
@@ -19,39 +21,148 @@
 
         <div class="article-detail-content">
 
-            <!-- Category + Date -->
+            <!-- ========================= -->
+            <!-- ARTICLE META -->
+            <!-- ========================= -->
+
             <div class="article-meta">
 
                 {% if article.category %}
-                    <span class="article-category">
+                    <a
+                        href="{% url 'category_articles' article.category.id %}"
+                        class="article-category"
+                    >
                         {{ article.category.name }}
-                    </span>
+                    </a>
                 {% endif %}
 
                 <span>
-                    {{ article.created_at|date:"F d, Y" }}
+                    {{ article.created_at|date:"F d, Y • H:i" }}
                 </span>
 
             </div>
 
 
-            <!-- Title -->
-            <h1>{{ article.title }}</h1>
+            <!-- ========================= -->
+            <!-- TITLE -->
+            <!-- ========================= -->
+
+            <h1 class="article-detail-title">
+                {{ article.title }}
+            </h1>
 
 
-            <!-- Author -->
+            <!-- ========================= -->
+            <!-- AUTHOR -->
+            <!-- ========================= -->
+
             <div class="article-detail-author">
-                By <strong>{{ article.author.username }}</strong>
+
+                <span>Written by</span>
+
+                <a
+                    href="{% url 'author_articles' article.author.id %}"
+                >
+                    <strong>
+                        {{ article.author.username }}
+                    </strong>
+                </a>
+
             </div>
 
 
-            <!-- Article Content -->
+            <!-- ========================= -->
+            <!-- ARTICLE CONTENT -->
+            <!-- ========================= -->
+
             <div class="article-content">
+
                 {{ article.content|linebreaks }}
+
             </div>
 
 
-            <!-- Statistics -->
+            <!-- ========================= -->
+            <!-- RATING SUMMARY -->
+            <!-- ========================= -->
+
+            <div class="article-rating-summary">
+
+                <div class="rating-stars">
+
+                    {% if article.average_rating %}
+
+                        {% if article.average_rating >= 1 %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                        {% if article.average_rating >= 2 %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                        {% if article.average_rating >= 3 %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                        {% if article.average_rating >= 4 %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                        {% if article.average_rating >= 5 %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                    {% else %}
+
+                        ☆☆☆☆☆
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="rating-score">
+
+                    {% if article.average_rating %}
+
+                        <strong>
+                            {{ article.average_rating|floatformat:1 }}
+                        </strong>
+
+                        <span>/ 5</span>
+
+                    {% else %}
+
+                        <span>No ratings yet</span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="rating-count">
+
+                    {{ article.ratings.count }} rating{{ article.ratings.count|pluralize }}
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- STATISTICS -->
+            <!-- ========================= -->
+
             <div class="article-stats">
 
                 <span>
@@ -66,24 +177,34 @@
                     ❤️ {{ article.favorites.count }}
                 </span>
 
-                    <span>
-                        ⭐ {{ article.average_rating|floatformat:1 }} / 5
-                    </span>
             </div>
 
 
-            <!-- Rating -->
+            <!-- ========================= -->
+            <!-- USER RATING -->
+            <!-- ========================= -->
+
             {% if user.is_authenticated %}
 
                 <div class="article-rating">
 
-                    <p>Rate this article:</p>
+                    <h3>
+                        Rate this article
+                    </h3>
 
-                    <form method="POST"
-                          action="{% url 'article_rate' article.id %}"
-                          class="rating-form">
+                    <p>
+                        How would you rate this article?
+                    </p>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'article_rate' article.id %}"
+                        class="rating-form"
+                    >
 
                         {% csrf_token %}
+
 
                         <div class="star-rating">
 
@@ -134,8 +255,10 @@
                         </div>
 
 
-                        <button type="submit"
-                                class="rating-submit-button">
+                        <button
+                            type="submit"
+                            class="rating-submit-button"
+                        >
                             Submit Rating
                         </button>
 
@@ -146,88 +269,110 @@
             {% endif %}
 
 
-            <!-- Actions -->
+            <!-- ========================= -->
+            <!-- ACTIONS -->
+            <!-- ========================= -->
+
             <div class="article-actions">
 
                 {% if user.is_authenticated %}
 
-                    <!-- Like -->
-                    <form method="POST"
-                          action="{% url 'article_like' article.id %}">
+                    <form
+                        method="POST"
+                        action="{% url 'article_like' article.id %}"
+                    >
 
                         {% csrf_token %}
 
-                        <button type="submit"
-                                class="article-action-button">
+                        <button
+                            type="submit"
+                            class="article-action-button"
+                        >
                             👍 Like
                         </button>
 
                     </form>
 
 
-                    <!-- Dislike -->
-                    <form method="POST"
-                          action="{% url 'article_dislike' article.id %}">
+                    <form
+                        method="POST"
+                        action="{% url 'article_dislike' article.id %}"
+                    >
 
                         {% csrf_token %}
 
-                        <button type="submit"
-                                class="article-action-button">
+                        <button
+                            type="submit"
+                            class="article-action-button"
+                        >
                             👎 Dislike
                         </button>
 
                     </form>
 
 
-                    <!-- Favorite -->
-                    <form method="POST"
-                          action="{% url 'article_favorite' article.id %}">
+                    <form
+                        method="POST"
+                        action="{% url 'article_favorite' article.id %}"
+                    >
 
                         {% csrf_token %}
 
-                        <button type="submit"
-                                class="article-action-button">
+                        <button
+                            type="submit"
+                            class="article-action-button"
+                        >
                             ❤️ Favorite
                         </button>
 
                     </form>
 
 
-                    <!-- Edit / Delete -->
                     {% if user.is_superuser or user.is_staff or article.author == user %}
 
-                        <a href="{% url 'article_edit' article.id %}"
-                           class="article-action-button">
-                            ✏️ Edit Article
+                        <a
+                            href="{% url 'article_edit' article.id %}"
+                            class="article-action-button"
+                        >
+                            ✏️ Edit
                         </a>
 
-                        <a href="{% url 'article_delete' article.id %}"
-                           class="article-action-button">
-                            🗑️ Delete Article
+                        <a
+                            href="{% url 'article_delete' article.id %}"
+                            class="article-action-button article-delete-button"
+                        >
+                            🗑️ Delete
                         </a>
 
                     {% endif %}
 
-
                 {% else %}
 
-                    <p>
+                    <div class="article-login-message">
+
                         <a href="{% url 'login' %}">
                             Log in
                         </a>
-                        to interact with this article.
-                    </p>
+
+                        to like, rate, or favorite this article.
+
+                    </div>
 
                 {% endif %}
 
             </div>
 
 
-            <!-- Back -->
+            <!-- ========================= -->
+            <!-- BACK -->
+            <!-- ========================= -->
+
             <div class="article-back">
 
-                <a href="{% url 'article_list' %}"
-                   class="btn btn-secondary">
+                <a
+                    href="{% url 'article_list' %}"
+                    class="btn btn-secondary"
+                >
                     ← Back to Articles
                 </a>
 

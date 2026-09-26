@@ -69,23 +69,45 @@ def article_list(request):
 
 
 def article_detail(request, article_id):
+
     article = get_object_or_404(
         Article.objects
-        .select_related("author", "category")
+        .filter(
+            id=article_id
+        )
+        .select_related(
+            "author",
+            "category"
+        )
         .prefetch_related(
             "ratings",
             "likes",
             "dislikes",
-            "favorites",
-        ),
-        id=article_id,
+            "favorites"
+        )
+        .annotate(
+            average_rating=Avg("ratings__value")
+        )
     )
+    if article.status == "pending":
 
-    return render(request, "article/article_detail.html", {
-        "article": article
-    })
+        if not (
+            request.user.is_authenticated
+            and (
+                request.user == article.author
+                or request.user.is_staff
+                or request.user.is_superuser
+            )
+        ):
+            return redirect("article_list")
 
-
+    return render(
+        request,
+        "article/article_detail.html",
+        {
+            "article": article
+        }
+    )
 @login_required
 def article_create(request):
     if request.method == "POST":

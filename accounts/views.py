@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-
+from articles.models import Article
 from .forms import RegisterForm
 
 from .forms import ProfileForm
@@ -12,6 +12,12 @@ def profile_view(request):
     profile, created = Profile.objects.get_or_create(
         user=request.user
     )
+
+    user_articles = Article.objects.filter(
+        author=request.user
+    ).select_related(
+        "category"
+    ).order_by("-created_at")
 
     if request.method == "POST":
         form = ProfileForm(
@@ -23,7 +29,6 @@ def profile_view(request):
 
         if form.is_valid():
             form.save()
-
             return redirect("profile")
 
     else:
@@ -34,11 +39,25 @@ def profile_view(request):
 
     return render(request, "account/profile.html", {
         "profile_user": request.user,
-        "article_count": request.user.articles.count(),
+        "profile": profile,
         "form": form,
+
+        "articles": user_articles,
+
+        "article_count": user_articles.count(),
+
+        "published_count": user_articles.filter(
+            status="published"
+        ).count(),
+
+        "pending_count": user_articles.filter(
+            status="pending"
+        ).count(),
+
+        "favorite_count": request.user.favorite_articles.filter(
+            status="published"
+        ).count(),
     })
-
-
 def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)

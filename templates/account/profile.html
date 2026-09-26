@@ -4,65 +4,181 @@
 
 {% block content %}
 
-<div class="profile-container">
+<div class="profile-page">
 
-    <div class="profile-card">
-
-        <h1>My Profile</h1>
+    <div class="profile-header">
 
         <div class="profile-info">
 
-            <div class="profile-row">
-                <span class="profile-label">Username</span>
-                <span>{{ profile_user.username }}</span>
+            <div class="profile-avatar">
+                {{ profile_user.username|first|upper }}
             </div>
 
-            <div class="profile-row">
-                <span class="profile-label">Articles</span>
-                <span>{{ article_count }}</span>
+            <div>
+                <h1>{{ profile_user.username }}</h1>
+
+                <p>
+                    Member since
+                    {{ profile_user.date_joined|date:"F Y" }}
+                </p>
             </div>
 
         </div>
 
-        <h2>Edit Information</h2>
+    </div>
+
+
+    <!-- STATISTICS -->
+
+    <section class="profile-stats">
+
+        <div class="profile-stat-card">
+            <span>📝</span>
+            <strong>{{ article_count }}</strong>
+            <p>Articles</p>
+        </div>
+
+        <div class="profile-stat-card">
+            <span>✅</span>
+            <strong>{{ published_count }}</strong>
+            <p>Published</p>
+        </div>
+
+        <div class="profile-stat-card">
+            <span>🕐</span>
+            <strong>{{ pending_count }}</strong>
+            <p>Pending</p>
+        </div>
+
+        <div class="profile-stat-card">
+            <span>❤️</span>
+            <strong>{{ favorite_count }}</strong>
+            <p>Favorites</p>
+        </div>
+
+    </section>
+
+
+    <!-- PROFILE EDIT -->
+
+    <section class="profile-section">
+
+        <div class="profile-section-header">
+            <h2>Profile Settings</h2>
+            <p>Update your profile information.</p>
+        </div>
 
         <form method="POST" enctype="multipart/form-data">
 
             {% csrf_token %}
 
-            {% for field in form %}
+            {{ form.as_p }}
 
-                <div class="form-group">
-
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                    </label>
-
-                    {{ field }}
-
-                    {% for error in field.errors %}
-                        <div class="error-message">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-
-                </div>
-
-            {% endfor %}
-
-            <button type="submit" class="btn btn-secondary">
+            <button type="submit" class="btn btn-primary">
                 Save Changes
             </button>
 
         </form>
 
-        <br>
+    </section>
 
-        <a href="{% url 'article_list' %}" class="btn btn-secondary">
-            Browse Articles
-        </a>
 
-    </div>
+    <!-- MY ARTICLES -->
+
+    <section class="profile-section">
+
+        <div class="profile-section-header">
+
+            <div>
+                <h2>My Articles</h2>
+                <p>Articles you have created.</p>
+            </div>
+
+            <a
+                href="{% url 'article_create' %}"
+                class="btn btn-primary"
+            >
+                + Create Article
+            </a>
+
+        </div>
+
+
+        {% if articles %}
+
+            <div class="profile-articles">
+
+                {% for article in articles %}
+
+                    <div class="profile-article-card">
+
+                        <div>
+
+                            <h3>
+                                {{ article.title }}
+                            </h3>
+
+                            <p>
+                                {{ article.created_at|date:"M d, Y" }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="profile-article-status">
+
+                            {% if article.status == "published" %}
+
+                                <span class="status-published">
+                                    ✓ Published
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-pending">
+                                    🕐 Pending
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'article_detail' article.id %}"
+                            class="profile-view-link"
+                        >
+                            View →
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="profile-empty">
+
+                <h3>You haven't created any articles yet.</h3>
+
+                <p>
+                    Share your first idea with the community.
+                </p>
+
+                <a
+                    href="{% url 'article_create' %}"
+                    class="btn btn-primary"
+                >
+                    Create Your First Article
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
 
 </div>
 

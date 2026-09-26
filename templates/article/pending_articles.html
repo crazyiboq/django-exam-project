@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<div class="articles-container">
+<div class="pending-container">
 
-    <div class="articles-header">
+    <div class="pending-header">
 
         <div>
             <span class="pending-label">
@@ -16,14 +16,11 @@
             <h1>Pending Articles</h1>
 
             <p>
-                Review articles before they are published.
+                Review submitted articles before they are published.
             </p>
         </div>
 
-        <a
-            href="{% url 'article_list' %}"
-            class="btn btn-secondary"
-        >
+        <a href="{% url 'article_list' %}" class="pending-back">
             ← Back to Articles
         </a>
 
@@ -32,92 +29,64 @@
 
     {% if articles %}
 
-        <div class="articles-grid">
+        <div class="pending-grid">
 
             {% for article in articles %}
 
-                <article class="article-card">
+                <article class="pending-card">
 
-                    {% if article.image %}
+                    <div class="pending-card-top">
 
-                        <img
-                            src="{{ article.image.url }}"
-                            alt="{{ article.title }}"
-                            class="article-image"
-                        >
-
-                    {% endif %}
-
-
-                    <div class="article-card-content">
-
-                        <div class="article-meta">
-
-                            {% if article.category %}
-
-                                <span class="article-category">
-                                    {{ article.category.name }}
-                                </span>
-
-                            {% endif %}
-
-                            <span class="pending-status">
-                                Pending
+                        {% if article.category %}
+                            <span class="article-category">
+                                {{ article.category.name }}
                             </span>
+                        {% endif %}
 
-                        </div>
+                        <span class="pending-status">
+                            Pending
+                        </span>
 
+                    </div>
 
-                        <h2>
-                            {{ article.title }}
-                        </h2>
+                    <h2>
+                        {{ article.title }}
+                    </h2>
 
+                    <p class="pending-author">
+                        By <strong>{{ article.author.username }}</strong>
+                    </p>
 
-                        <p class="article-author">
-                            By {{ article.author.username }}
-                        </p>
+                    <p class="pending-date">
+                        Submitted {{ article.created_at|date:"M d, Y • H:i" }}
+                    </p>
 
+                    <p class="pending-preview">
+                        {{ article.content|truncatewords:35 }}
+                    </p>
 
-                        <p class="article-preview">
-                            {{ article.content|truncatewords:30 }}
-                        </p>
+                    <div class="pending-actions">
 
+                        <a
+                            href="{% url 'article_detail' article.id %}"
+                            class="pending-view"
+                        >
+                            View Article
+                        </a>
 
-                        <div class="pending-date">
+                        <form
+                            method="POST"
+                            action="{% url 'approve_article' article.id %}"
+                        >
+                            {% csrf_token %}
 
-                            Submitted:
-                            {{ article.created_at|date:"M d, Y H:i" }}
-
-                        </div>
-
-
-                        <div class="pending-actions">
-
-                            <a
-                                href="{% url 'article_detail' article.id %}"
-                                class="btn btn-secondary"
+                            <button
+                                type="submit"
+                                class="pending-approve"
                             >
-                                Preview
-                            </a>
-
-
-                            <form
-                                method="POST"
-                                action="{% url 'approve_article' article.id %}"
-                            >
-
-                                {% csrf_token %}
-
-                                <button
-                                    type="submit"
-                                    class="approve-button"
-                                >
-                                    ✓ Approve
-                                </button>
-
-                            </form>
-
-                        </div>
+                                ✓ Approve
+                            </button>
+                        </form>
 
                     </div>
 
@@ -135,17 +104,14 @@
                 ✓
             </div>
 
-            <h2>No pending articles</h2>
+            <h2>Everything is reviewed</h2>
 
             <p>
-                All submitted articles have been reviewed.
+                There are currently no articles waiting for approval.
             </p>
 
-            <a
-                href="{% url 'article_list' %}"
-                class="btn btn-secondary"
-            >
-                View Articles
+            <a href="{% url 'article_list' %}" class="pending-view">
+                View Published Articles
             </a>
 
         </div>
